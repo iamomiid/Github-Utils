@@ -1,20 +1,26 @@
 {
   "name": "why-failed",
   "version": "1.0.0",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "type": "commonjs",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
-    "build": "tsc",
     "typecheck": "tsc --noEmit"
   },
-  "keywords": [],
+  "keywords": [
+    "github",
+    "actions",
+    "workflow",
+    "ci",
+    "debugging",
+    "artifacts",
+    "ai"
+  ],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Investigate failed GitHub workflow runs with AI-powered analysis",
   "devDependencies": {
+    "@types/adm-zip": "^0.5.8",
     "@types/node": "^25.5.0",
     "@types/node-notifier": "^8.0.5",
     "tsx": "^4.21.0",
@@ -22,6 +28,7 @@
   },
   "packageManager": "pnpm@10.24.0+sha512.01ff8ae71b4419903b65c60fb2dc9d34cf8bb6e06d03bde112ef38f7a34d6904c424ba66bea5cdcf12890230bf39f9580473140ed9c946fef328b6e5238a345a",
   "dependencies": {
+    "adm-zip": "^0.5.16",
     "node-notifier": "^10.0.1"
   }
 }
