@@ -1,0 +1,157 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "github-pr-reviewer",
+  "title": "GitHub PR Reviewer",
+  "description": "Enhanced GitHub PR review management with team requests, filtering, and quick actions",
+  "icon": "icon.png",
+  "author": "",
+  "categories": [
+    "Productivity",
+    "Developer Tools"
+  ],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "review-requests",
+      "title": "Review Requests",
+      "subtitle": "GitHub",
+      "description": "View all PRs awaiting your review including team requests",
+      "mode": "view"
+    },
+    {
+      "name": "my-pull-requests",
+      "title": "My Pull Requests",
+      "subtitle": "GitHub",
+      "description": "View and manage your own pull requests",
+      "mode": "view"
+    },
+    {
+      "name": "menu-bar",
+      "title": "PR Reviewer Menu Bar",
+      "subtitle": "GitHub",
+      "description": "Quick access to review requests from the menu bar",
+      "mode": "menu-bar",
+      "interval": "5m"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "token",
+      "type": "password",
+      "required": true,
+      "title": "Personal Access Token",
+      "description": "GitHub token with 'repo' scope (required). Add 'read:org' scope for team review requests."
+    },
+    {
+      "name": "includeTeams",
+      "type": "checkbox",
+      "required": false,
+      "title": "Include Team Review Requests",
+      "description": "Show PRs where your teams are requested (requires 'read:org' scope on token)",
+      "default": false
+    },
+    {
+      "name": "defaultFilter",
+      "type": "dropdown",
+      "required": false,
+      "title": "Default Filter",
+      "description": "Default filter to apply when opening the extension",
+      "default": "all",
+      "data": [
+        {
+          "title": "All PRs",
+          "value": "all"
+        },
+        {
+          "title": "Personal Requests",
+          "value": "personal"
+        },
+        {
+          "title": "Team Requests",
+          "value": "team"
+        },
+        {
+          "title": "By Repository",
+          "value": "repo"
+        }
+      ]
+    },
+    {
+      "name": "organizations",
+      "type": "textfield",
+      "required": false,
+      "title": "Organizations",
+      "description": "Comma-separated list of organizations to filter by (leave empty for all)",
+      "placeholder": "e.g., github, microsoft"
+    },
+    {
+      "name": "excludedRepos",
+      "type": "textfield",
+      "required": false,
+      "title": "Excluded Repositories",
+      "description": "Comma-separated list of repositories to exclude (format: owner/repo)",
+      "placeholder": "e.g., owner/repo1, owner/repo2"
+    },
+    {
+      "name": "showRepository",
+      "type": "checkbox",
+      "required": false,
+      "title": "Show Repository Name",
+      "description": "Display the repository name in the PR list",
+      "default": true
+    },
+    {
+      "name": "showAuthor",
+      "type": "checkbox",
+      "required": false,
+      "title": "Show Author",
+      "description": "Display the PR author's avatar",
+      "default": true
+    },
+    {
+      "name": "showLastUpdated",
+      "type": "checkbox",
+      "required": false,
+      "title": "Show Last Updated",
+      "description": "Display when the PR was last updated",
+      "default": true
+    },
+    {
+      "name": "showLineDiff",
+      "type": "checkbox",
+      "required": false,
+      "title": "Show Line Diff",
+      "description": "Display the number of lines added/removed",
+      "default": true
+    },
+    {
+      "name": "showApprovals",
+      "type": "checkbox",
+      "required": false,
+      "title": "Show Approval Count",
+      "description": "Display the number of approvals (requires additional API calls)",
+      "default": false
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.50.0",
+    "@raycast/utils": "^1.5.0",
+    "date-fns": "^2.30.0"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.6",
+    "@types/node": "^20.8.10",
+    "@types/react": "^18.2.27",
+    "eslint": "^8.51.0",
+    "prettier": "^3.0.3",
+    "typescript": "^5.2.2"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "fix-lint": "ray lint --fix",
+    "lint": "ray lint",
+    "publish": "npx @raycast/api@latest publish"
+  },
+  "packageManager": "pnpm@10.24.0+sha512.01ff8ae71b4419903b65c60fb2dc9d34cf8bb6e06d03bde112ef38f7a34d6904c424ba66bea5cdcf12890230bf39f9580473140ed9c946fef328b6e5238a345a"
+}

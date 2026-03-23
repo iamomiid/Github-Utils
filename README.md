@@ -61,6 +61,30 @@ pnpm start -o <owner> -r <repo> -t <token> [-w <workflow-id>]
 
 See [packages/workflow-running/README.md](packages/workflow-running/README.md) for detailed documentation.
 
+### github-pr-reviewer (Raycast Extension)
+
+Enhanced GitHub PR review management Raycast extension.
+
+**Key Features:**
+- View all PRs awaiting your review (personal + team requests)
+- Track your own PRs' review status
+- Menu bar with review count
+- Detailed PR info (checks, labels, changes)
+- Organization and repository filtering
+- Quick actions (open, copy, refresh)
+
+**Commands:**
+- **Review Requests** - View PRs awaiting your review
+- **My Pull Requests** - Manage your own PRs
+- **Menu Bar** - Quick access from macOS menu bar
+
+**Setup:**
+1. Install the extension in Raycast
+2. Configure GitHub Personal Access Token in preferences
+3. Optional: Set organizations to filter by
+
+See [packages/github-pr-reviewer/README.md](packages/github-pr-reviewer/README.md) for detailed documentation.
+
 ## Getting Started
 
 1. Install dependencies:
@@ -77,13 +101,16 @@ See [packages/workflow-running/README.md](packages/workflow-running/README.md) f
 
 ## Workspace Structure
 
-This is a pnpm workspace. Each package in the `packages/` directory is an independent CLI tool.
+This is a pnpm workspace. Each package in the `packages/` directory is an independent tool:
+- CLI tools for GitHub automation
+- Raycast extensions for developer productivity
 
 ```
 packages/
 ├── why-failed/          # GitHub workflow failure investigator
 ├── merge-queue-check/   # GitHub merge queue status checker
-└── workflow-running/    # GitHub running workflow checker
+├── workflow-running/    # GitHub running workflow checker
+└── github-pr-reviewer/  # Raycast extension for PR reviews
 ```
 
 ## Development
