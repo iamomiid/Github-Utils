@@ -338,6 +338,7 @@ async function analyzeWithAgent(
 	reportPath: string,
 	dirPath: string,
 	agentCommand: string,
+	customPrompt?: string,
 ): Promise<{ htmlPath: string } | null> {
 	try {
 		console.log(`Analyzing with agent: ${agentCommand}...`);
@@ -358,7 +359,7 @@ async function analyzeWithAgent(
 
 		// Create a prompt file for codex
 		const promptPath = path.join(dirPath, "codex-instructions.txt");
-		const instructions = `Read the file at "${reportPath}" which contains a GitHub workflow failure report.
+		let instructions = `Read the file at "${reportPath}" which contains a GitHub workflow failure report.
 
 IMPORTANT: Also explore the "${dirPath}" directory to see what artifacts were downloaded. Look at:
 - Any extracted artifact directories
@@ -378,7 +379,17 @@ The HTML should be well-styled with:
 - Clean, modern design similar to GitHub's interface
 - Color-coded verdict section (green for safe to retry, yellow for caution, red for do not retry)
 - Proper typography and spacing
-- Responsive layout
+- Responsive layout`;
+
+		// Append custom prompt if provided
+		if (customPrompt) {
+			instructions += `
+
+ADDITIONAL INSTRUCTIONS FROM USER:
+${customPrompt}`;
+		}
+
+		instructions += `
 
 Use file write to create the HTML file. Return the path to the created file when done.`;
 
@@ -510,6 +521,7 @@ interface ParsedArgs {
 	githubToken: string;
 	artifactPrefix?: string;
 	agent?: string;
+	customPrompt?: string;
 }
 
 function parseArgs(argv: string[]): ParsedArgs {
@@ -526,6 +538,8 @@ function parseArgs(argv: string[]): ParsedArgs {
 			args.artifactPrefix = argv[++i];
 		} else if (arg === "-g" || arg === "--agent") {
 			args.agent = argv[++i];
+		} else if (arg === "-p" || arg === "--prompt") {
+			args.customPrompt = argv[++i];
 		} else if (arg === "-h" || arg === "--help") {
 			showHelp();
 			process.exit(0);
@@ -556,6 +570,9 @@ function showHelp() {
 	console.log(
 		"  -g, --agent <command>          Optional. Custom coding agent command (default: codex)",
 	);
+	console.log(
+		"  -p, --prompt <text>            Optional. Additional instructions to append to the AI prompt",
+	);
 	console.log("  -h, --help                     Show this help message");
 	console.log("");
 	console.log("Examples:");
@@ -568,6 +585,9 @@ function showHelp() {
 	console.log(
 		"  why-failed -w https://github.com/owner/repo/actions/runs/123 -t ghp_xxx -g 'openai run'",
 	);
+	console.log(
+		"  why-failed -w https://github.com/owner/repo/actions/runs/123 -t ghp_xxx -p 'Focus on test failures'",
+	);
 }
 
 const main = async () => {
@@ -577,6 +597,7 @@ const main = async () => {
 			githubToken: token,
 			artifactPrefix,
 			agent = "codex exec --full-auto --skip-git-repo-check",
+			customPrompt,
 		} = parseArgs(process.argv);
 
 		if (artifactPrefix) {
@@ -652,6 +673,7 @@ const main = async () => {
 				reportPath,
 				reportDir,
 				agent,
+				customPrompt,
 			);
 			if (analysisResult) {
 				htmlPath = analysisResult.htmlPath;

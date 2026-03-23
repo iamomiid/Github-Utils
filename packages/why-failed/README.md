@@ -5,7 +5,7 @@ A CLI tool to investigate failed GitHub workflow runs, download artifacts, and a
 ## Usage
 
 ```bash
-why-failed -w <workflow-url> -t <token> [-a <artifact-prefix>] [-g <agent-command>]
+why-failed -w <workflow-url> -t <token> [-a <artifact-prefix>] [-g <agent-command>] [-p <custom-prompt>]
 ```
 
 ## Options
@@ -14,6 +14,7 @@ why-failed -w <workflow-url> -t <token> [-a <artifact-prefix>] [-g <agent-comman
 - `-t, --token <token>` - Required. GitHub personal access token
 - `-a, --artifact-prefix <prefix>` - Optional. Only download artifacts starting with this prefix
 - `-g, --agent <command>` - Optional. Custom coding agent command (default: `codex exec --full-auto --skip-git-repo-check`)
+- `-p, --prompt <text>` - Optional. Additional instructions to append to the AI prompt
 - `-h, --help` - Show help message
 
 ## Examples
@@ -28,6 +29,12 @@ why-failed -w https://github.com/owner/repo/actions/runs/123456789 -t ghp_xxx -a
 # With custom agent
 why-failed -w https://github.com/owner/repo/actions/runs/123456789 -t ghp_xxx -g 'openai run'
 
+# With custom prompt for AI analysis
+why-failed -w https://github.com/owner/repo/actions/runs/123456789 -t ghp_xxx -p 'Focus on test failures in the e2e suite'
+
+# Combine multiple options
+why-failed -w https://github.com/owner/repo/actions/runs/123456789 -t ghp_xxx -a playwright -p 'Check for flaky tests'
+
 # For Apple Shortcuts
 why-failed -w "$1" -t "your_github_token"
 ```
@@ -38,6 +45,7 @@ why-failed -w "$1" -t "your_github_token"
 - **Pagination Support**: Handles workflows with 100+ jobs
 - **Artifact Management**: Downloads, extracts, and catalogs all artifacts
 - **AI Analysis**: Analyzes failures using customizable coding agents
+- **Custom Prompts**: Add your own instructions to guide the AI analysis
 - **Interactive Notifications**: Shows job count and opens analysis report on click
 - **Comprehensive Reports**: Generates markdown report and HTML analysis
 
@@ -115,6 +123,27 @@ why-failed -w <url> -t <token> -g 'your-agent-command'
 ```
 
 If no agent is installed, the tool will skip AI analysis and only generate the markdown report.
+
+#### Custom Prompts
+
+You can add custom instructions to the AI agent using the `-p` or `--prompt` flag:
+
+```bash
+# Add context about your specific setup
+why-failed -w <url> -t <token> -p 'This is a Rails app. Focus on database migration errors.'
+
+# Ask for specific analysis
+why-failed -w <url> -t <token> -p 'Check if this is a known flaky test issue'
+
+# Combine with artifact filtering
+why-failed -w <url> -t <token> -a playwright -p 'Analyze the test screenshots and identify UI failures'
+```
+
+The custom prompt is appended to the default instructions sent to the AI agent, allowing you to:
+- Provide context about your project
+- Request specific types of analysis
+- Focus on particular aspects of the failure
+- Ask specific questions about the workflow
 
 ## Development
 

@@ -13,13 +13,14 @@ Investigate failed GitHub workflow runs with AI-powered analysis.
 - Fetches logs for all failed jobs (supports 100+ jobs with pagination)
 - Generates comprehensive markdown reports
 - AI analysis with customizable agents (Codex or custom)
+- Custom prompts to guide AI analysis
 - Interactive macOS notifications
 - Stores data temporarily in `/tmp` for automatic cleanup
 
 **Usage:**
 ```bash
 cd packages/why-failed
-pnpm start -w <workflow-url> -t <token> [-a <prefix>] [-g <agent>]
+pnpm start -w <workflow-url> -t <token> [-a <prefix>] [-g <agent>] [-p <prompt>]
 ```
 
 See [packages/why-failed/README.md](packages/why-failed/README.md) for detailed documentation.
