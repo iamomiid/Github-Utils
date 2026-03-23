@@ -43,6 +43,24 @@ pnpm start -o <owner> -r <repo> -t <token>
 
 See [packages/merge-queue-check/README.md](packages/merge-queue-check/README.md) for detailed documentation.
 
+### workflow-running
+
+Check if there are any running GitHub workflow runs and send notifications.
+
+**Key Features:**
+- Single REST API call to fetch running workflows
+- Optional filtering by specific workflow ID or filename
+- Shows workflow name, run number, branch, and URL
+- Sends macOS notifications
+
+**Usage:**
+```bash
+cd packages/workflow-running
+pnpm start -o <owner> -r <repo> -t <token> [-w <workflow-id>]
+```
+
+See [packages/workflow-running/README.md](packages/workflow-running/README.md) for detailed documentation.
+
 ## Getting Started
 
 1. Install dependencies:
@@ -64,7 +82,8 @@ This is a pnpm workspace. Each package in the `packages/` directory is an indepe
 ```
 packages/
 ├── why-failed/          # GitHub workflow failure investigator
-└── merge-queue-check/   # GitHub merge queue status checker
+├── merge-queue-check/   # GitHub merge queue status checker
+└── workflow-running/    # GitHub running workflow checker
 ```
 
 ## Development
