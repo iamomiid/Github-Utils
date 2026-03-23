@@ -25,6 +25,24 @@ pnpm start -w <workflow-url> -t <token> [-a <prefix>] [-g <agent>] [-p <prompt>]
 
 See [packages/why-failed/README.md](packages/why-failed/README.md) for detailed documentation.
 
+### merge-queue-check
+
+Check GitHub merge queue status and send notifications.
+
+**Key Features:**
+- Single GraphQL API call for fast performance
+- Shows count of PRs in merge queue
+- Sends macOS notifications
+- Lists PR numbers and titles in console
+
+**Usage:**
+```bash
+cd packages/merge-queue-check
+pnpm start -o <owner> -r <repo> -t <token>
+```
+
+See [packages/merge-queue-check/README.md](packages/merge-queue-check/README.md) for detailed documentation.
+
 ## Getting Started
 
 1. Install dependencies:
@@ -45,7 +63,8 @@ This is a pnpm workspace. Each package in the `packages/` directory is an indepe
 
 ```
 packages/
-└── why-failed/     # GitHub workflow failure investigator
+├── why-failed/          # GitHub workflow failure investigator
+└── merge-queue-check/   # GitHub merge queue status checker
 ```
 
 ## Development
