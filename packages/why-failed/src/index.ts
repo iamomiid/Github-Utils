@@ -143,13 +143,35 @@ async function fetchFailedJobs(
 	repo: string,
 	runId: string,
 	token: string,
+	jobName?: string,
+	jobRegex?: string,
 ): Promise<Job[]> {
 	const allJobs = await fetchAllJobs(owner, repo, runId, token);
 	console.log(`  Total jobs: ${allJobs.length}`);
 
-	return allJobs.filter(
+	let filtered = allJobs.filter(
 		(job) => job.conclusion === "failure" || job.conclusion === "cancelled",
 	);
+
+	if (jobName) {
+		const lowerJobName = jobName.toLowerCase();
+		filtered = filtered.filter((job) =>
+			job.name.toLowerCase().includes(lowerJobName),
+		);
+		console.log(`  After job name filter: ${filtered.length}`);
+	}
+
+	if (jobRegex) {
+		try {
+			const regex = new RegExp(jobRegex, "i");
+			filtered = filtered.filter((job) => regex.test(job.name));
+			console.log(`  After job regex filter: ${filtered.length}`);
+		} catch (error) {
+			console.error(`  Warning: Invalid regex pattern "${jobRegex}"`);
+		}
+	}
+
+	return filtered;
 }
 
 async function fetchJobLogs(
@@ -522,29 +544,35 @@ interface ParsedArgs {
 	artifactPrefix?: string;
 	agent?: string;
 	customPrompt?: string;
+	jobName?: string;
+	jobRegex?: string;
 }
 
 function parseArgs(argv: string[]): ParsedArgs {
 	const args: Partial<ParsedArgs> = {};
 
-	for (let i = 2; i < argv.length; i++) {
-		const arg = argv[i];
+  for (let i = 2; i < argv.length; i++) {
+    const arg = argv[i];
 
-		if (arg === "-w" || arg === "--workflow-url") {
-			args.workflowUrl = argv[++i];
-		} else if (arg === "-t" || arg === "--token" || arg === "--github-token") {
-			args.githubToken = argv[++i];
-		} else if (arg === "-a" || arg === "--artifact-prefix") {
-			args.artifactPrefix = argv[++i];
-		} else if (arg === "-g" || arg === "--agent") {
-			args.agent = argv[++i];
-		} else if (arg === "-p" || arg === "--prompt") {
-			args.customPrompt = argv[++i];
-		} else if (arg === "-h" || arg === "--help") {
-			showHelp();
-			process.exit(0);
-		}
-	}
+    if (arg === "-w" || arg === "--workflow-url") {
+      args.workflowUrl = argv[++i];
+    } else if (arg === "-t" || arg === "--token" || arg === "--github-token") {
+      args.githubToken = argv[++i];
+    } else if (arg === "-a" || arg === "--artifact-prefix") {
+      args.artifactPrefix = argv[++i];
+    } else if (arg === "-g" || arg === "--agent") {
+      args.agent = argv[++i];
+    } else if (arg === "-p" || arg === "--prompt") {
+      args.customPrompt = argv[++i];
+    } else if (arg === "-j" || arg === "--job-name") {
+      args.jobName = argv[++i];
+    } else if (arg === "-r" || arg === "--job-regex") {
+      args.jobRegex = argv[++i];
+    } else if (arg === "-h" || arg === "--help") {
+      showHelp();
+      process.exit(0);
+    }
+  }
 
 	if (!args.workflowUrl || !args.githubToken) {
 		showHelp();
@@ -555,42 +583,56 @@ function parseArgs(argv: string[]): ParsedArgs {
 }
 
 function showHelp() {
-	console.log("Usage: why-failed [options]");
-	console.log("");
-	console.log("Options:");
-	console.log(
-		"  -w, --workflow-url <url>       Required. GitHub workflow run URL",
-	);
-	console.log(
-		"  -t, --token <token>            Required. GitHub personal access token",
-	);
-	console.log(
-		"  -a, --artifact-prefix <prefix> Optional. Only download artifacts starting with prefix",
-	);
-	console.log(
-		"  -g, --agent <command>          Optional. Custom coding agent command (default: codex)",
-	);
-	console.log(
-		"  -p, --prompt <text>            Optional. Additional instructions to append to the AI prompt",
-	);
-	console.log("  -h, --help                     Show this help message");
-	console.log("");
-	console.log("Examples:");
-	console.log(
-		"  why-failed -w https://github.com/owner/repo/actions/runs/123 -t ghp_xxx",
-	);
-	console.log(
-		"  why-failed --workflow-url https://github.com/owner/repo/actions/runs/123 --token ghp_xxx -a playwright",
-	);
-	console.log(
-		"  why-failed -w https://github.com/owner/repo/actions/runs/123 -t ghp_xxx -g 'openai run'",
-	);
-	console.log(
-		"  why-failed -w https://github.com/owner/repo/actions/runs/123 -t ghp_xxx -p 'Focus on test failures'",
-	);
+  console.log("Usage: why-failed [options]");
+  console.log("");
+  console.log("Options:");
+  console.log(
+    "  -w, --workflow-url <url>       Required. GitHub workflow run URL",
+  );
+  console.log(
+    "  -t, --token <token>            Required. GitHub personal access token",
+  );
+  console.log(
+    "  -a, --artifact-prefix <prefix> Optional. Only download artifacts starting with prefix",
+  );
+  console.log(
+    "  -j, --job-name <pattern>       Optional. Only analyze jobs with names containing this pattern",
+  );
+  console.log(
+    "  -r, --job-regex <regex>        Optional. Only analyze jobs matching this regex (for matrix filtering)",
+  );
+  console.log(
+    "  -g, --agent <command>          Optional. Custom coding agent command (default: codex)",
+  );
+  console.log(
+    "  -p, --prompt <text>            Optional. Additional instructions to append to the AI prompt",
+  );
+  console.log("  -h, --help                     Show this help message");
+  console.log("");
+  console.log("Examples:");
+  console.log(
+    "  why-failed -w https://github.com/owner/repo/actions/runs/123 -t ghp_xxx",
+  );
+  console.log(
+    "  why-failed --workflow-url https://github.com/owner/repo/actions/runs/123 --token ghp_xxx -a playwright",
+  );
+  console.log(
+    "  why-failed -w https://github.com/owner/repo/actions/runs/123 -t ghp_xxx -j 'test'",
+  );
+  console.log(
+    "  why-failed -w https://github.com/owner/repo/actions/runs/123 -t ghp_xxx -r 'test \\(ubuntu-latest'",
+  );
+  console.log(
+    "  why-failed -w https://github.com/owner/repo/actions/runs/123 -t ghp_xxx -g 'openai run'",
+  );
+  console.log(
+    "  why-failed -w https://github.com/owner/repo/actions/runs/123 -t ghp_xxx -p 'Focus on test failures'",
+  );
 }
 
 const main = async () => {
+	const startTime = Date.now();
+
 	try {
 		const {
 			workflowUrl: url,
@@ -598,10 +640,20 @@ const main = async () => {
 			artifactPrefix,
 			agent = "codex exec --full-auto --skip-git-repo-check",
 			customPrompt,
+			jobName,
+			jobRegex,
 		} = parseArgs(process.argv);
 
 		if (artifactPrefix) {
 			console.log(`Artifact filter: ${artifactPrefix}*`);
+		}
+
+		if (jobName) {
+			console.log(`Job name filter: ${jobName}`);
+		}
+
+		if (jobRegex) {
+			console.log(`Job regex filter: ${jobRegex}`);
 		}
 
 		const { owner, repo, runId } = parseWorkflowUrl(url);
@@ -642,7 +694,7 @@ const main = async () => {
 		);
 
 		console.log("Fetching all jobs...");
-		const failedJobs = await fetchFailedJobs(owner, repo, runId, token);
+		const failedJobs = await fetchFailedJobs(owner, repo, runId, token, jobName, jobRegex);
 		console.log(`  Failed jobs: ${failedJobs.length}`);
 
 		let jobsWithLogs: FailedJobWithLogs[] = [];
@@ -685,14 +737,17 @@ const main = async () => {
 			workflowRun.conclusion === "failure" ||
 			workflowRun.conclusion === "cancelled";
 
+		const duration = Date.now() - startTime;
+		const durationSec = (duration / 1000).toFixed(1);
+
 		if (!isFailure) {
 			notifier.notify({
 				title: "✅ Workflow Successful",
-				message: `No failed jobs in ${owner}/${repo}`,
+				message: `No failed jobs in ${owner}/${repo} (${durationSec}s)`,
 				wait: false,
 			});
 		} else {
-			const message = `${failedJobs.length} job(s) failed`;
+			const message = `${failedJobs.length} job(s) failed (${durationSec}s)`;
 
 			const notifyOptions: any = {
 				title: `❌ Failed: ${owner}/${repo}`,

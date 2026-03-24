@@ -13,6 +13,8 @@ why-failed -w <workflow-url> -t <token> [-a <artifact-prefix>] [-g <agent-comman
 - `-w, --workflow-url <url>` - Required. GitHub workflow run URL
 - `-t, --token <token>` - Required. GitHub personal access token
 - `-a, --artifact-prefix <prefix>` - Optional. Only download artifacts starting with this prefix
+- `-j, --job-name <pattern>` - Optional. Only analyze jobs with names containing this pattern
+- `-r, --job-regex <regex>` - Optional. Only analyze jobs matching this regex (for matrix filtering)
 - `-g, --agent <command>` - Optional. Custom coding agent command (default: `codex exec --full-auto --skip-git-repo-check`)
 - `-p, --prompt <text>` - Optional. Additional instructions to append to the AI prompt
 - `-h, --help` - Show help message
@@ -25,6 +27,12 @@ why-failed -w https://github.com/owner/repo/actions/runs/123456789 -t ghp_xxx
 
 # With artifact filter
 why-failed -w https://github.com/owner/repo/actions/runs/123456789 -t ghp_xxx -a playwright-report
+
+# With job name filter
+why-failed -w https://github.com/owner/repo/actions/runs/123456789 -t ghp_xxx -j "test"
+
+# With regex filter for matrix jobs (e.g., ubuntu-latest)
+why-failed -w https://github.com/owner/repo/actions/runs/123456789 -t ghp_xxx -r "test \(ubuntu-latest"
 
 # With custom agent
 why-failed -w https://github.com/owner/repo/actions/runs/123456789 -t ghp_xxx -g 'openai run'
@@ -43,10 +51,11 @@ why-failed -w "$1" -t "your_github_token"
 
 - **GitHub API Integration**: Fetches workflow run info, jobs, and artifacts
 - **Pagination Support**: Handles workflows with 100+ jobs
+- **Job Filtering**: Filter by job name (substring) or regex (for matrix jobs)
 - **Artifact Management**: Downloads, extracts, and catalogs all artifacts
 - **AI Analysis**: Analyzes failures using customizable coding agents
 - **Custom Prompts**: Add your own instructions to guide the AI analysis
-- **Interactive Notifications**: Shows job count and opens analysis report on click
+- **Interactive Notifications**: Shows job count with analysis time and opens analysis report on click
 - **Comprehensive Reports**: Generates markdown report and HTML analysis
 
 ## How it works
@@ -66,7 +75,7 @@ why-failed -w "$1" -t "your_github_token"
    - Retry recommendations
    - Verdict on whether it's safe to retry
 10. Sends a native macOS notification:
-    - Shows number of failed jobs (e.g., "5 job(s) failed")
+    - Shows number of failed jobs with analysis time (e.g., "5 job(s) failed (12.5s)")
     - Click to open the HTML analysis report
 
 ### Output
@@ -145,6 +154,24 @@ The custom prompt is appended to the default instructions sent to the AI agent, 
 - Focus on particular aspects of the failure
 - Ask specific questions about the workflow
 
+#### Job Filtering
+
+When dealing with matrix workflows or many jobs, you can filter which jobs to analyze:
+
+```bash
+# Filter by job name substring (case-insensitive)
+why-failed -w <url> -t <token> -j "test"
+
+# Filter by regex pattern (case-insensitive)
+# Useful for matrix filtering (e.g., specific OS or Node version)
+why-failed -w <url> -t <token> -r "test \(ubuntu-latest"
+
+# Combine filters
+why-failed -w <url> -t <token> -j "build" -r "node-18"
+```
+
+The filters are applied after finding failed jobs, so you only see the failures you're interested in.
+
 ## Development
 
 ```bash
@@ -163,4 +190,4 @@ pnpm run typecheck  # Check TypeScript types
 3. Set the input to "Shortcut Input"
 4. Now you can share workflow URLs directly to this shortcut!
 
-When a workflow fails, you'll get a notification showing the number of failed jobs. Click it to open the AI analysis report.
+When a workflow fails, you'll get a notification showing the number of failed jobs and analysis time (e.g., "5 job(s) failed (12.5s)"). Click it to open the AI analysis report.
