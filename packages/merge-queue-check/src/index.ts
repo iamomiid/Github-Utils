@@ -185,6 +185,7 @@ const main = async () => {
 				title: "✅ Merge Queue Empty",
 				message: `No PRs in merge queue for ${owner}/${repo}`,
 				wait: false,
+				open: `https://github.com/${owner}/${repo}/queue`,
 			});
 			console.log("Merge queue is empty");
 		} else {
@@ -192,6 +193,7 @@ const main = async () => {
 				title: "📦 Merge Queue",
 				message: `${queueEntries.length} PR(s) in merge queue for ${owner}/${repo}`,
 				wait: false,
+				open: `https://github.com/${owner}/${repo}/queue`,
 			});
 			console.log(`Found ${queueEntries.length} PR(s) in merge queue:`);
 			queueEntries.forEach((entry, i) => {
