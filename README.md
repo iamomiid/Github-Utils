@@ -61,6 +61,25 @@ pnpm start -o <owner> -r <repo> -t <token> [-w <workflow-id>]
 
 See [packages/workflow-running/README.md](packages/workflow-running/README.md) for detailed documentation.
 
+### pr-merge-monitor
+
+Monitor a pull request until it is merged, removed from auto-merge or the merge queue, closed without merging, or times out.
+
+**Key Features:**
+- Monitors a single PR with repeated GraphQL checks
+- Detects successful merge completion
+- Detects when a PR is kicked out of auto-merge or the merge queue
+- Sends timeout notifications after a configurable monitoring window
+- Sends macOS notifications with a link back to the PR
+
+**Usage:**
+```bash
+cd packages/pr-merge-monitor
+pnpm start -o <owner> -r <repo> -p <pr-number> -t <token> [--timeout 45] [--interval 30]
+```
+
+See [packages/pr-merge-monitor/README.md](packages/pr-merge-monitor/README.md) for detailed documentation.
+
 ### github-pr-reviewer (Raycast Extension)
 
 Enhanced GitHub PR review management Raycast extension.
@@ -110,6 +129,7 @@ packages/
 ├── why-failed/          # GitHub workflow failure investigator
 ├── merge-queue-check/   # GitHub merge queue status checker
 ├── workflow-running/    # GitHub running workflow checker
+├── pr-merge-monitor/    # PR merge / queue monitor with notifications
 └── github-pr-reviewer/  # Raycast extension for PR reviews
 ```
 
